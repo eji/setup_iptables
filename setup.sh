@@ -10,12 +10,12 @@ fi
 
 MYHOST=$(/sbin/ifconfig eth0 | grep 'inet addr:' | sed -e 's/^.*inet addr://' -e 's/ .*//')
 if [ "" = "${MYHOST}" ]; then
-  echo "Don't know the IP of this host."
+  echo "Don't know the IP of this host." >&2
   exit 2
 fi
 MYHOST_SSHD_PORT=$(grep "^Port" /etc/ssh/sshd_config | awk '{print $2}')
 if [ "" = "${MYHOST_SSHD_PORT}" ]; then
-  echo "Don't know the sshd port of this host."
+  echo "Don't know the sshd port of this host." >&2
   exit 3
 fi
 ANY_HOST='0.0.0.0/0'
@@ -42,7 +42,7 @@ iptables -A INPUT -s 10.0.0.0/8 -j DROP
 iptables -A INPUT -s 172.16.0.0/12 -j DROP
 iptables -A INPUT -s 192.168.0.0/16 -j DROP
 
-# ICMP ANY_HOST -> FRIPSACE (ping)
+# ICMP ANY_HOST -> MYHOST (ping)
 ###################################
 # long term
 iptables -A INPUT -p icmp --icmp-type echo-request -s $ANY_HOST -d $MYHOST -m limit --limit 1/m --limit-burst 10 -j ACCEPT
